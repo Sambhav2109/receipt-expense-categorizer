@@ -8,7 +8,7 @@ const formatCurrency = value => new Intl.NumberFormat('en-IN', {style:'currency'
 function App() {
   const [items,setItems]=useState([]), [meta,setMeta]=useState({total:0,count:0}), [category,setCategory]=useState('All'), [search,setSearch]=useState(''), [start,setStart]=useState(''), [end,setEnd]=useState(''), [selected,setSelected]=useState(null), [busy,setBusy]=useState(false), [error,setError]=useState('');
   const load=()=>fetch(`${API}/receipts?${new URLSearchParams({...(category!=='All'?{category}:{}),...(search?{search}:{}),...(start?{start_date:start}:{}),...(end?{end_date:end}:{})})}`).then(r=>r.json()).then(d=>{setItems(d.items);setMeta(d)}).catch(()=>setError('Could not connect to the API.'));
-  useEffect(load,[category,search,start,end]);
+  useEffect(()=>{load()},[category,search,start,end]);
   const upload=async e=>{const file=e.target.files[0]; if(!file)return; setBusy(true);setError('');const f=new FormData();f.append('file',file);const r=await fetch(`${API}/receipts`,{method:'POST',body:f});if(!r.ok){setError((await r.json()).detail||'Upload failed');}else load();setBusy(false);e.target.value='';};
   const update=async (id,cat)=>{await fetch(`${API}/receipts/${id}`,{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({category:cat})});load()};
   const selectedItems = Array.isArray(selected?.items) ? selected.items : [];
